@@ -1,0 +1,116 @@
+---
+name: "((manifest-name))"
+
+releases:
+- name: on-demand-service-broker
+  version: 0.15.1
+
+stemcells:
+- alias: trusty
+  os: ubuntu-trusty
+  version: latest
+instance_groups:
+- name: broker
+  instances: 1
+  jobs:
+  - name: broker
+    release: on-demand-service-broker
+    properties:
+      port: 8080
+      username: odb-username
+      password: ((odb-password))
+      cf:
+        url: ((cf-api-url))
+        authentication:
+          url: ((cf-uaa-url))
+          user_credentials:
+            username: ((cf-username))
+            password: "((cf-password))"
+      bosh:
+        url: https://((bosh-hostname)):25555
+        authentication:
+          uaa:
+            url: https://((bosh-hostname)):8443
+            client_id: ((bosh_client))
+            client_secret: ((bosh_client_secret))
+  vm_type: m3.medium
+  stemcell: trusty
+  networks:
+  - name: services
+  azs:
+  - az1
+  - az2
+- name: register-broker
+  lifecycle: errand
+  instances: 1
+  jobs:
+  - name: register-broker
+    release: on-demand-service-broker
+    properties:
+      broker_name: ((broker_name))
+      cf:
+        api_url: ((cf-api-url))
+        admin_username: ((cf-username))
+        admin_password: "((cf-password))"
+  vm_type: t2.micro
+  stemcell: trusty
+  networks:
+  - name: services
+  azs:
+  - az1
+  - az2
+- name: deregister-broker
+  lifecycle: errand
+  instances: 1
+  jobs:
+  - name: deregister-broker
+    release: on-demand-service-broker
+    properties:
+      broker_name: ((broker_name))
+      cf:
+        api_url: ((cf-api-url))
+        admin_username: ((cf-username))
+        admin_password: "((cf-password))"
+  vm_type: t2.micro
+  stemcell: trusty
+  networks:
+  - name: services
+  azs:
+  - az1
+  - az2
+- name: delete-all-service-instances
+  lifecycle: errand
+  instances: 1
+  jobs:
+  - name: delete-all-service-instances
+    release: on-demand-service-broker
+    properties:
+      cf:
+        api_url: ((cf-api-url))
+        admin_username: ((cf-username))
+        admin_password: "((cf-password))"
+  vm_type: t2.micro
+  stemcell: trusty
+  networks:
+  - name: services
+  azs:
+  - az1
+  - az2
+- name: upgrade-all-service-instances
+  lifecycle: errand
+  instances: 1
+  jobs:
+  - name: upgrade-all-service-instances
+    release: on-demand-service-broker
+  vm_type: t2.micro
+  stemcell: trusty
+  networks:
+  - name: services
+  azs:
+  - az1
+  - az2
+update:
+  canaries: 1
+  canary_watch_time: 3000-180000
+  update_watch_time: 3000-180000
+  max_in_flight: 4

@@ -1,0 +1,29 @@
+- type: replace
+  path: /releases/-
+  value:
+    name: routing
+    version: 0.143.0
+    url:  https://bosh.io/d/github.com/cloudfoundry-incubator/cf-routing-release?v=0.143.0
+    sha1: 74737a367b34df97161f56b427e2d291dbe54e38
+- type: replace
+  path: /instance_groups/name=broker/jobs/-
+  value:
+    name: route_registrar
+    release: routing
+    properties:
+      nats:
+        machines:
+        - "((nats-ip))"
+        port: 4222
+        user: nats
+        password: "((nats-password))"
+      route_registrar:
+        routes:
+        - name: "((service-name))"
+          registration_interval: 20s
+          port: 8080
+          uris:
+          - "((service-name)).((hostname))"
+- type: replace
+  path: /instance_groups/name=register-broker/jobs/name=register-broker/broker_uri?
+  value: https://((service-name)).((hostname))

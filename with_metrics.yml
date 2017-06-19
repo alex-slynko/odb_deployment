@@ -1,0 +1,45 @@
+- type: replace
+  path: /releases/-
+  value:
+    name: loggregator
+    version: 58
+- type: replace
+  path: /releases/-
+  value:
+    name: service-metrics
+    version: 1.5.0
+
+- type: replace
+  path: /instance_groups/name=broker/jobs/-
+  value:
+    name: metron_agent
+    release: loggregator
+    properties:
+      metron_agent:
+        deployment: ((manifest_name))
+        protocols:
+          - tcp
+      metron_endpoint:
+        shared_secret:  ((loggregator_secret))
+      loggregator:
+        etcd:
+          machines: ((loggregator_etcd_ips))
+      loggregator_endpoint:
+        shared_secret:  ((loggregator_secret))
+
+- type: replace
+  path: /instance_groups/name=broker/jobs/-
+  value:
+    name: service-metrics-adapter
+    release: on-demand-service-broker
+
+- type: replace
+  path: /instance_groups/name=broker/jobs/-
+  value:
+    name: service-metrics
+    release: service_metrics
+    properties:
+      service_metrics:
+        execution_interval_seconds: 10
+        origin: ((manifest_name))
+        monit_dependencies: [broker]
