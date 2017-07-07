@@ -8,7 +8,7 @@ releases:
 stemcells:
 - alias: trusty
   os: ubuntu-trusty
-  version: latest
+  version: ((stemcell_version))
 instance_groups:
 - name: broker
   instances: 1
@@ -38,8 +38,8 @@ instance_groups:
   networks:
   - name: services
   azs:
-  - az1
-  - az2
+  - z1
+  - z2
 - name: register-broker
   lifecycle: errand
   instances: 1
@@ -57,8 +57,8 @@ instance_groups:
   networks:
   - name: services
   azs:
-  - az1
-  - az2
+  - z1
+  - z2
 - name: deregister-broker
   lifecycle: errand
   instances: 1
@@ -76,8 +76,8 @@ instance_groups:
   networks:
   - name: services
   azs:
-  - az1
-  - az2
+  - z1
+  - z2
 - name: delete-all-service-instances
   lifecycle: errand
   instances: 1
@@ -94,8 +94,8 @@ instance_groups:
   networks:
   - name: services
   azs:
-  - az1
-  - az2
+  - z1
+  - z2
 - name: upgrade-all-service-instances
   lifecycle: errand
   instances: 1
@@ -107,8 +107,8 @@ instance_groups:
   networks:
   - name: services
   azs:
-  - az1
-  - az2
+  - z1
+  - z2
 update:
   canaries: 1
   canary_watch_time: 3000-180000
